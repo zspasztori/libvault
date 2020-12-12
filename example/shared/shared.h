@@ -5,9 +5,12 @@
 
 Vault::Client getRootClient(const Vault::Token &rootToken) {
   Vault::TokenStrategy tokenStrategy{rootToken};
-  Vault::Config config = Vault::ConfigBuilder().withTlsEnabled(false).build();
+  Vault::Config config = Vault::ConfigBuilder().withDebug(true).withTlsEnabled(false).build();
+  Vault::HttpErrorCallback httpErrorCallback = [&](std::string err) {
+    std::cout << err << std::endl;
+  };
 
-  return Vault::Client{config, tokenStrategy};
+  return Vault::Client{config, tokenStrategy, httpErrorCallback};
 }
 
 Vault::Client getAppRoleClient(const Vault::RoleId &roleId, const Vault::SecretId &secretId) {
