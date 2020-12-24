@@ -470,18 +470,33 @@ namespace Vault {
     std::optional<std::string> unseal(const Parameters &parameters);
     std::optional<std::string> openApi();
 
-    class Auth {
-    public:
+    struct Auth {
       explicit Auth(const Client &client) : client_(client) {}
 
-      [[nodiscard]] std::optional<std::string> list() const;
-      [[nodiscard]] std::optional<std::string> enable(const Path &path, const Parameters &parameters) const;
-      [[nodiscard]] std::optional<std::string> disable(const Path &path) const;
-      [[nodiscard]] std::optional<std::string> readTuning(const Path &path) const;
-      [[nodiscard]] std::optional<std::string> tune(const Path &path, const Parameters &parameters) const;
+      [[nodiscard]] std::optional<std::string> list() const {
+        return HttpConsumer::get(client_, getUrl(Path{}));
+      }
+
+      std::optional<std::string> enable(const Path &path, const Parameters &parameters) {
+        return HttpConsumer::post(client_, getUrl(path), parameters);
+      }
+
+      std::optional<std::string> disable(const Path &path) {
+        return HttpConsumer::del(client_, getUrl(path));
+      }
+
+      [[nodiscard]] std::optional<std::string> readTuning(const Path &path) const {
+        return HttpConsumer::get(client_, getUrl(Vault::Path{path + "/tune"}));
+      };
+
+      std::optional<std::string> tune(const Path &path, const Parameters &parameters) {
+        return HttpConsumer::post(client_, getUrl(Vault::Path{path + "/tune"}), parameters);
+      };
 
     private:
-      [[nodiscard]] Url getUrl(const Path &path) const;
+      [[nodiscard]] Url getUrl(const Path &path) const {
+        return client_.getUrl("/v1/sys/auth", path.empty() ? path : Path{"/" + path});
+      };
 
       const Client &client_;
     };

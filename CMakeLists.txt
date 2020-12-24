@@ -75,7 +75,6 @@ add_library(vault SHARED
     src/support/Base64.cpp
     src/support/HttpClient.cpp
     src/support/HttpConsumer.cpp
-    src/system/auth/Auth.cpp
     src/system/audit/Audit.cpp
     src/system/auditing/Auditing.cpp
     src/system/config/ControlGroup.cpp
