@@ -12,10 +12,12 @@ Vault::HttpConsumer::get(const Vault::Client &client, const Vault::Url &url) {
 
   if (HttpClient::is_success(response)) {
     return std::optional<std::string>(response.value().body.value());
-  } else {
-    client.getHttpClient().reportError(response);
-    return std::nullopt;
   }
+
+  if (response.has_value())
+    client.getHttpClient().reportError(response);
+
+  return std::nullopt;
 }
 
 std::optional<std::string>
